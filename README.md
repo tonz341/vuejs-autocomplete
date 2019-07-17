@@ -1,5 +1,11 @@
 # vuejs-auto-complete
 
+forked
+CHANGES
+remove click auto search bug
+added abort on overlapping search fetch
+disabled initial display when input has been tabbed
+
 [![Travis Build](https://img.shields.io/travis/charliekassel/vuejs-autocomplete.svg?branch=master)](https://travis-ci.org/charliekassel/vuejs-autocomplete?branch=master)
 [![Version](https://img.shields.io/npm/v/vuejs-auto-complete.svg)](https://www.npmjs.com/package/vuejs-auto-complete)
 [![Coveralls github](https://img.shields.io/coveralls/github/charliekassel/vuejs-autocomplete.svg)](https://coveralls.io/github/charliekassel/vuejs-autocomplete?branch=master)
