@@ -12,7 +12,6 @@
           :disabled="disableInput"
           :maxlength="maxlength"
           :class="inputClass"
-          @click="search"
           @input="search"
           @keydown.enter="enter"
           @keydown.tab="close"
@@ -63,6 +62,8 @@
 
 <script type="text/babel">
 import debounce from 'lodash/debounce'
+import AbortController from 'abort-controller'
+
 export default {
   props: {
     /**
@@ -193,8 +194,13 @@ export default {
       error: null,
       selectedId: null,
       selectedDisplay: null,
-      eventListener: false
+      eventListener: false,
+      controller: null,
+      signal: null
     }
+  },
+  created () {
+    this.resetAbort()
   },
   computed: {
     showResults () {
@@ -229,6 +235,13 @@ export default {
   },
   methods: {
     /**
+     * Abort init
+     */
+    resetAbort () {
+      this.controller = new AbortController()
+      this.signal = this.controller.signal
+    },
+    /**
      * Search wrapper method
      */
     search () {
@@ -259,12 +272,14 @@ export default {
      * @param {String} url
      */
     resourceSearch: debounce(function (url) {
+      this.controller.abort()
       if (!this.display) {
         this.results = []
         return
       }
       this.loading = true
       this.setEventListener()
+      this.resetAbort() // enable again after abort
       this.request(url)
     }, 200),
 
@@ -274,6 +289,7 @@ export default {
      */
     request (url) {
       let promise = fetch(url, {
+        signal: this.signal,
         method: this.method,
         credentials: this.getCredentials(),
         headers: this.getHeaders()
@@ -293,8 +309,11 @@ export default {
           this.loading = false
         })
         .catch(error => {
-          this.error = error.message
-          this.loading = false
+            // remove user aborted error popping out
+          if (error.code !== 20) {
+            this.error = error.message
+            this.loading = false
+          }
         })
     },
 
@@ -482,7 +501,9 @@ export default {
      */
     close () {
       if (!this.value || !this.selectedDisplay) {
-        this.clear()
+        if (!this.initialDisplay) {
+          this.clear()
+        }
       }
       if (this.selectedDisplay !== this.display && this.value) {
         this.display = this.selectedDisplay

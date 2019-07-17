@@ -10,10 +10,12 @@
 
       <div class="example">
         <h5>Example string source</h5>
+        <input type="text" />
         <autocomplete
           source="https://api.github.com/search/repositories?q="
           results-property="items"
           results-display="full_name"
+          initial-display="Phantom"
           @selected="setXHRValue"
           @clear="setXHRValue({})">
         </autocomplete>
